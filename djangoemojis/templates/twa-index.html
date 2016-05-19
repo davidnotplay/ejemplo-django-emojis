@@ -1,0 +1,164 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Twemoji Awesome</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'djangotwa/twemoji-awesome.css' %}"/>
+	<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+
+	<style type="text/css">
+		body{
+			font-size: 16px;
+			font-family: arial, sans-serif;
+			color: #444;
+			text-align: center;
+		}
+
+		.container{
+			display: table;
+			text-align: left;
+			max-width: 900px;
+			margin: auto;
+		}
+
+		.container > div{
+			display: table-cell;
+			vertical-align: top;
+			width: 50%;
+		}
+		
+		ul{
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		.messages{
+			margin-right: 3rem;
+			padding-right: 1rem;
+			border-right: 1px solid #666;
+		}
+
+		.messages > li > div{
+			font-size: .8rem;
+			text-align: right;
+		}
+
+		#twemoji_list{
+			padding-bottom: 1rem;
+			text-align: center;
+		}
+		
+		#new_message label, #new_message input, #new_message textarea{
+			display: block;
+			width: 100%;
+			margin-bottom: .5rem;
+		}
+
+		input, textarea{
+			padding: .4rem;
+		}
+
+		button{
+			background: #ddd;
+			border: 1px solid #aaa;
+			padding: .4rem .8rem;
+			font-size: 16px;
+			color: #666;
+		}
+
+
+		button:hover{
+			box-shadow: 0 0 4px 0 #aaa;
+			border: 1px solid #444;
+			color: #444;
+		}
+
+		button:active{
+			box-shadow: none;
+		}
+
+		ul.errorlist > li{
+			font-size: 12px;
+			color: #BE1010;
+		}
+
+
+	</style>
+
+	<script type="text/javascript">
+        /*
+                Devuelve un array de 3 valores con el texto del textarea.
+                @return [string, string, string]
+                        - 1º celda: Texto del textarea hasta el cursor o hasta el principio de la selección.
+                        - 2º celda: Texto del textarea seleccionado. Si no hay nada seleccionado entonces es una cadena vacía.
+                        - 3º celda: Texto del textarea después del cursor hasta el final o despúes de la selección hasta el final.
+        */
+        function getSelectedText(textarea){
+	        var text = textarea.val(),
+	            start = textarea.prop('selectionStart'),
+	            end = textarea.prop('selectionEnd');
+
+	        return [
+	            text.substr(0, start),
+	            start != end? text.substr(start, end-start): '',
+	            text.substr(end)
+	        ];
+        } 
+
+		$(document).on('ready', function(){
+			var textarea = $('#id_message');
+
+			$('#twemoji_list  span').on('click', function(){
+				var text = getSelectedText(textarea);
+				textarea.val(text[0] + ':' + $(this).data('name') + ':' + text[2]);
+			})
+		});
+	</script>
+
+</head>
+<body>
+	<h1>Twemoji awesome</h1>
+	<p>
+		Ejemplo de insertar emojis en un texto con Django
+	</p>
+	<div class="container">
+		<div>
+			<h2>Mensajes</h2>
+			<ul class="messages">
+				{% for msg in messages %}
+				<li>
+					<p>
+						{{ msg.message_parsed|safe }}
+						<div>
+							Escrito por {{ msg.author }} hace {{ msg.created|timesince }}
+						</div>
+					</p>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div>
+			<h2>Escribe un nuevo mensaje</h2>
+			<p>Haz clic en un emoji, si quieres añadirlo al texto</p>
+			<div id="twemoji_list">
+				{% for emoji in emojis %}
+					<span class="twa twa-lg twa-{{ emoji.classname }}" data-name="{{ emoji.name }}"></span>
+				{% endfor %}
+			</div>
+			<form action="{% url 'djangoemojis:index' %}" method="post" id="new_message">
+				{% csrf_token %}
+				<ul>
+					{{ form.as_ul }}
+				</ul>
+				<button type="submit">Enviar</button>
+			</form>	
+		</div>
+	</div>
+	<div style="text-align:center;padding-top: 20px;">
+		Más información en <a href="http://buhoprogramador.com">Buho programador</a>
+	</div>
+</body>
+</html>
