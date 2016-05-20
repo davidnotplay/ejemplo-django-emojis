@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class DjangotwaConfig(AppConfig):
-    name = 'djangotwa'
+    name = 'djangoemojis'

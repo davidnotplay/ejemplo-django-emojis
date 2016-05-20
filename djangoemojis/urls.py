@@ -4,5 +4,5 @@ from django.conf.urls import url
 import djangoemojis.views as views
 
 urlpatterns = [
-	url(r'^|index$', views.index_view, name='index')
+	url(r'^$', views.index_view, name='index')
 ]
