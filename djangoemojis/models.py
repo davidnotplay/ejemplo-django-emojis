@@ -25,13 +25,16 @@ EMOJIS = {
 }
 
 
-def parse_twa(text):
+def transform_message(text):
 	# Función que transforma el código `:emoji-name:` en código html con el emoji seleccionado.
 
 	# Escapamos los caracteres html del texto. Para poder utilizar el texto con seguridad en las plantillas.
 	text = escape(text)
 
-	# Accedemos al diccionarío EMOJIS y reemplazamos las coincidencias del texto por el código html.
+	# Transformamos los saltos de lineas en etiquetas <br>
+	text = text.replace('\r\n', '<br>').replace('\n', '<br>').replace('\r', '<br>')
+
+	# Accedemos al diccionario EMOJIS y reemplazamos las coincidencias del texto por el código html.
 	for name, classname in EMOJIS.items():
 		text = text.replace(':%s:' % name, '<span class="twa twa-lg twa-%s"></span>' % classname)
 
@@ -51,7 +54,6 @@ class Message(models.Model):
 
 	# Cadena con el author del mensaje.
 	author = models.CharField(max_length=40)
-
 	# Texto del mensaje sin transformar. Se utilizará si se quieren hacer modificaciones en el mensaje.
 	message = models.TextField()
 	# Texto del mensaje ya transformado. Será el que se muestre al público.
@@ -63,7 +65,8 @@ class Message(models.Model):
 		return self.message[:100]
 
 	def save(self, *args, **kwargs):
-		# Antes de guardar el mensaje en la BD. Se transforma el texto del mensaje y se guarda en `self.messaged_parsed`
+		# Antes de guardar el mensaje en la BD.
+		# Se transforma el texto del mensaje y se guarda en `self.messaged_parsed`
 
-		self.message_parsed = parse_twa(self.message)
+		self.message_parsed = transform_message(self.message)
 		super(Message, self).save(*args, **kwargs)
