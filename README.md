@@ -1,5 +1,7 @@
 ## Ejemplo crear mensajes con emojis en Django
 
+![captura de django emojis](https://buhoprogramador.s3.amazonaws.com/galeria/ejemplo-django-emojis.png)
+
 App de ejemplo para Django que permite crear y mostrar mensajes con emojis.
 
 Para instalar:
